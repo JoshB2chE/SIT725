@@ -3,41 +3,58 @@ const userController = require('../controllers/userController');
 
 const router = express.Router();
 
-router.get('/', userController.getAllUsers);
+router.get('/', async (req, res) => {
+  try {
+    const users = await userController.getAllUsers();
+    res.json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+});
 
-//! DEPRECATED TO WORK WITH VANILLA HTML FORMS
-// router.post('/', userController.createUser);
-// router.put('/:id', userController.updateUser);
-// router.delete('/:id', userController.deleteUser);
-
-//* NEW ROUTES TO WORK WITH VANILLA HTML FORMS
 router.post('/', async (req, res) => {
   try {
-    console.log(req.body);
-    const { mode } = req.body;
-
-    if (mode === 'create') {
-      await userController.createUser(req.body);
-      res.redirect('/users');
-    }
-
-    else if (mode === 'update') {
-      await userController.updateUser(req.body);
-      res.redirect('/users');
-    }
-
-    else if (mode === 'delete') {
-      await userController.deleteUser(req.body);
-      res.redirect('/users');
-    }
-
-    else {
-      res.status(400).send({ message: 'Invalid mode' });
+    const user = await userController.createUser(req.body);
+    res.status(201).json(user);
+  } catch (error) {
+    if (error.message === 'Missing fields') {
+      console.error(error);
+      res.status(400).json({ error: error.message });
+    } else {
+      console.error(error);
+      res.status(500).json({ error: error.message });
     }
   }
+});
 
-  catch (error) {
-    res.status(500).send({ message: error.message });
+router.put('/:id', async (req, res) => {
+  try {
+    const user = await userController.updateUser(req.params.id, req.body);
+    res.json(user);
+  } catch (error) {
+    if (error.message === 'Missing fields' || error.message === 'User not found') {
+      console.error(error);
+      res.status(400).json({ error: error.message });
+    } else {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+});
+
+router.delete('/:id', async (req, res) => {
+  try {
+    await userController.deleteUser(req.params.id);
+    res.status(200).send();
+  } catch (error) {
+    if (error.message === 'User not found') {
+      console.error(error);
+      res.status(400).json({ error: error.message });
+    } else {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
   }
 });
 

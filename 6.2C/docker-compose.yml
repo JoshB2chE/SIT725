@@ -1,6 +1,6 @@
 services:
   api:
-    container_name: api
+    container_name: api_62C
     image: oven/bun
     ports:
       - "3000:3000"
@@ -11,7 +11,7 @@ services:
     environment:
       - NODE_ENV=development
   db:
-    container_name: db
+    container_name: db_62C
     image: mongo:latest
     ports:
       - "27017:27017"

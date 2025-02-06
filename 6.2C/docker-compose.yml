@@ -1,0 +1,19 @@
+services:
+  api:
+    container_name: api
+    image: oven/bun
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./api:/app
+    working_dir: /app
+    command: "/bin/sh -c 'bun i && bun start'"
+    environment:
+      - NODE_ENV=development
+  db:
+    container_name: db
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo:/data/db
